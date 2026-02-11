@@ -109,23 +109,32 @@ def main():
     elif args.command == "export":
         db.sync_from_gemini()
         stats = db.get_recent_requests(limit=10000)
-        if args.format == 'json':
-            data = []
-            for r in stats:
-                data.append({
-                    "timestamp": r[1],
-                    "session_id": r[2],
-                    "message_id": r[3],
-                    "model": r[4],
-                    "input_tokens": r[5],
-                    "output_tokens": r[6],
-                    "total_tokens": r[7]
-                })
-            print(json.dumps(data, indent=2))
-        elif args.format == 'csv':
-            writer = csv.writer(sys.stdout)
-            writer.writerow(["id", "timestamp", "session_id", "message_id", "model", "input", "output", "total"])
-            writer.writerows(stats)
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = os.path.join(db.PROJECT_ROOT, "data", f"export_{timestamp}.{args.format}")
+        
+        with open(filename, 'w') as f:
+            if args.format == 'json':
+                data = []
+                for r in stats:
+                    data.append({
+                        "timestamp": r[1],
+                        "session_id": r[2],
+                        "message_id": r[3],
+                        "model": r[4],
+                        "input_tokens": r[5],
+                        "output_tokens": r[6],
+                        "cached_tokens": r[7],
+                        "thought_tokens": r[8],
+                        "total_tokens": r[9]
+                    })
+                json.dump(data, f, indent=2)
+            elif args.format == 'csv':
+                writer = csv.writer(f)
+                writer.writerow(["id", "timestamp", "session_id", "message_id", "model", "input", "output", "cached", "thought", "total"])
+                writer.writerows(stats)
+        
+        print(f"Data exported to: {filename}")
 
 if __name__ == "__main__":
     main()

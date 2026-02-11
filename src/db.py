@@ -4,7 +4,9 @@ import datetime
 import json
 import glob
 
-DB_PATH = os.path.expanduser("~/.geminiwatch/geminiwatch.db")
+# Use local data directory relative to this script
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DB_PATH = os.path.join(PROJECT_ROOT, "data", "geminiwatch.db")
 GEMINI_DIR = os.path.expanduser("~/.gemini")
 
 def init_db():
